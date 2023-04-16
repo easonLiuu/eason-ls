@@ -1,3 +1,3 @@
 # eason-ls文件浏览脚手架
 
-## node
+## node操作文件权限
