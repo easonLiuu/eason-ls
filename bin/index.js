@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 const fs = require('fs')
 const parse = require('./parseArgs')
+const auth = require('./auth')
+const getFileType = require('./getFileType')
 
 const dir = process.cwd()
 
@@ -25,18 +27,20 @@ if (!isList) {
         const stat = fs.statSync(file)
         // 获取文件的mode码
         const mode = stat.mode
+        const fileType = getFileType(mode)
+        const authString = auth(mode)
         // 通过"与"判断当前文件是不是目录
-        const isDir = mode & fs.constants.S_IFDIR
+        // const isDir = mode & fs.constants.S_IFDIR
         // 通过"与"判断当前文件是不是文件
-        const isFile = mode & fs.constants.S_IFREG
-        console.log(mode, stat.isDirectory(), isFile > 0, fs.constants.S_IFDIR)
+        // const isFile = mode & fs.constants.S_IFREG
+        // console.log(mode, stat.isDirectory(), isFile > 0, fs.constants.S_IFDIR)
         if (index === files.length - 1) {
-            output += file
+            output += fileType + authString + '\t' + file
         } else {
-            output += file + '\n'
+            output += fileType + authString + '\t' + file + '\n'
         }
     })
 }
 console.log(output)
 
-console.log(process.argv, args, isAll, isList)
+// console.log(process.argv, args, isAll, isList)
