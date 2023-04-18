@@ -4,6 +4,7 @@ const parse = require('./parseArgs')
 const auth = require('./auth')
 const getFileType = require('./getFileType')
 const getFileUser = require('./getFileUser')
+const getFileSizeAndDate = require('./getFileSizeAndDate')
 
 const dir = process.cwd()
 
@@ -26,20 +27,27 @@ if (!isList) {
     files.forEach((file, index) => {
         // 获取文件详细信息
         const stat = fs.statSync(file)
+        const isDirectory = stat.isDirectory()
+        let size = 1
+        if (isDirectory) {
+            const subDir = fs.readdirSync(file)
+            size = subDir.length
+        }
         // 获取文件的mode码
         const mode = stat.mode
         const fileType = getFileType(mode)
         const authString = auth(mode)
         const fileUser = getFileUser(stat)
+        const fileSizeAndDate = getFileSizeAndDate(stat)
         // 通过"与"判断当前文件是不是目录
         // const isDir = mode & fs.constants.S_IFDIR
         // 通过"与"判断当前文件是不是文件
         // const isFile = mode & fs.constants.S_IFREG
         // console.log(mode, stat.isDirectory(), isFile > 0, fs.constants.S_IFDIR)
         if (index === files.length - 1) {
-            output += fileType + authString + '\t' + fileUser + '\t' + file
+            output += fileType + authString + ' ' + size + '\t' + fileUser + '\t' + fileSizeAndDate + ' ' + file
         } else {
-            output += fileType + authString + '\t' + fileUser + '\t' + file + '\n'
+            output += fileType + authString + ' ' + size + '\t' + fileUser + '\t' + fileSizeAndDate + ' ' + file + '\n'
         }
     })
 }
